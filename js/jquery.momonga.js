@@ -1,7 +1,7 @@
 /*
- *  Project:
- *  Description:
- *  Author:
+ *  Project: Momonga
+ *  Description: jQuery Plugin to build HTML content with the use of jQuery UI sortable and drag & drop functionality
+ *  Author: Karsten Frohwein
  *  License: MIT
  */
 ;(function ($) {
