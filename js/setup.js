@@ -1,3 +1,0 @@
-(function ($) {
-    $('.momongaSortable').momonga();
-}(jQuery));

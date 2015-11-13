@@ -46,7 +46,7 @@
                     <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
                 </div>
             </div>
-            <div class="momongaItem">
+            <div class="{momongaItem}">
                 <div contenteditable="true">
                     <h3>Subheading</h3>
 
@@ -167,8 +167,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.5.4/adapters/jquery.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.0/holder.min.js"></script>
-<script src="../js/momonga.js"></script>
-<script src="../js/setup.js"></script>
-
+<script src="../src/jquery.momonga.js"></script>
+<script language="JavaScript">
+    (function ($) {
+        $('.momongaSortable').momonga();
+    }(jQuery));
+</script>
 </body>
 </html>
