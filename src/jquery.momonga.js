@@ -64,7 +64,13 @@
 
                 toolbar.find('.momongaDuplicate').click(
                     function () {
-                        console.log('AAA');
+                        var active = $('.momongaActive');
+                        var newItem = active.clone(true);
+                        active.after(newItem);
+                        var bgColor = newItem.css('background-color');
+                        newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
+                            newItem.animate({backgroundColor: bgColor}, 400);
+                        });
                     }
                 );
                 toolbar.find('.momongaDelete').click(
@@ -83,7 +89,7 @@
                             },
                             buttons: {
                                 "Delete active item": function () {
-                                    $('.momongaActive').animate({backgroundColor: "#fafad2"}, 400).fadeOut(400, function () {
+                                    $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
                                         $('.momongaActive').remove();
                                     });
                                     $(this).dialog("close");
