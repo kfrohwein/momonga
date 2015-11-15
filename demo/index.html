@@ -9,6 +9,21 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/start/jquery-ui.css">
     <link rel="stylesheet" href="../css/momonga.css">
+
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 150px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.64);
+            padding: 5px;
+            text-align: center;
+            background-color: #e5e5e5;
+        }
+
+    </style>
 </head>
 <body>
 <div class="container">
@@ -23,6 +38,9 @@
         <h3 class="text-muted">Project name</h3>
 
         <button id="start" type="button" class="btn btn-primary">Start Editing</button>
+        <!--        <button id="stop" type="button" class="btn btn-primary">Stop Editing</button>
+                <button id="save" type="button" class="btn btn-primary">Save Data</button>-->
+
     </div>
 
     <div class="jumbotron momongaSortable">
@@ -161,8 +179,6 @@
     <p>&copy; Lore Ipsum Dolor</p>
 </footer>
 
-</div>
-
 <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="https://cdn.ckeditor.com/4.5.4/standard/ckeditor.js"></script>
@@ -177,7 +193,19 @@
                     $('.momongaSortable').momonga();
                 }
         );
+        $('.momongaSortable').on('click', '.ckeditor', function () {
+            $(this).attr('contenteditable', 'true');
+            $(this).ckeditor();
+        });
+
     }(jQuery));
 </script>
+
+<div class="sidebar">
+    <h4>Drag these presets into your content</h4>
+
+    <div class="momongaPresets"></div>
+</div>
+
 </body>
 </html>

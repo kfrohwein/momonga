@@ -3,16 +3,22 @@
  *  Description: jQuery Plugin to build HTML content with the use of jQuery UI sortable and drag & drop functionality
  *  Author: Karsten Frohwein
  *  License: MIT
+ *
+ *  @todo Capsulation of all major functionallity.
  */
 ;(function ($) {
     "use strict";
     $.fn.momonga = function (options) {
 
         var settings = $.extend({
+            presetsContainer: '.momongaPresets',
             connectionClass: 'momongaConnected',
             placeholder: 'momongaPlaceholder',
+            presetsFile: 'momongaPresets.json',
             handler: '.momongaDragHandle',
-            cursor: 'move'
+            item: '.momongaItem',
+            cursor: 'move',
+            presets: {}
         }, options);
 
         // Add to all targets a class so we can connect them and mark as drop targets.
@@ -27,9 +33,43 @@
             cursor: settings.cursor,
             receive: function (event, ui) {
                 // @todo Do replacement by data attribute to template.
-                $(this).children('[data-momonga-type]').replaceWith('<div class="momongaItem">Hallo Welt!</div>');
+
+                $(this).children('[data-momongatype]').each(
+                    function () {
+                        console.log(settings.presets[$(this).data('momongatype')].html);
+                        $(this).replaceWith(
+                            settings.presets[$(this).data('momongatype')].html
+                        );
+
+                    }
+                );
             }
         });
+
+        // Load the presets and add them to our toolbar.
+        // @todo Only load file if there weren't any presets at start.
+        $.getJSON(settings.presetsFile).done(
+            function (data) {
+                settings.presets = data;
+                $.each(settings.presets, function (key, value) {
+                    $(settings.presetsContainer).append('<div class="momongaDraggable" data-momongatype="' +
+                        key +
+                        '">' +
+                        value.preview +
+                        '</div>');
+                });
+                // Make all source items draggable.
+                // @todo Bind by .on() so this can be outside of the ajax request.
+                $('.momongaDraggable').draggable({
+                    containment: 'window',
+                    connectToSortable: '.' + settings.connectionClass,
+                    helper: 'clone',
+                    revert: 'invalid',
+                    cursor: 'move'
+                });
+            }
+        );
+
 
         // Add delete dialog.
         //@todo This can be done better.
@@ -38,20 +78,9 @@
             'The current selected item will be permanently deleted and cannot be recovered. Are you sure you want to proceed?</p>' +
             '</div>');
 
-        // @todo Find or create the toolbar
 
-
-        // Make all source items draggable.
-        $('.momongaDraggable').draggable({
-            containment: 'window',
-            connectToSortable: settings.connectionClass,
-            helper: 'clone',
-            revert: 'invalid',
-            cursor: 'move',
-        });
-
-        // Register click event to all items so they get the toolbar on click.
-        $('.momongaItem').click(
+        // Register click event to all items so they get the context toolbar on click.
+        $(this).on('click', settings.item,
             function () {
                 $('.momongaActive').removeClass('momongaActive');
                 $('.momongaToolbar').remove();
