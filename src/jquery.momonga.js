@@ -36,9 +36,8 @@
 
                 $(this).children('[data-momongatype]').each(
                     function () {
-                        console.log(settings.presets[$(this).data('momongatype')].html);
                         $(this).replaceWith(
-                            settings.presets[$(this).data('momongatype')].html
+                            '<div class="momongaItem">' + settings.presets[$(this).data('momongatype')].html + '</div>'
                         );
 
                     }
@@ -52,11 +51,11 @@
             function (data) {
                 settings.presets = data;
                 $.each(settings.presets, function (key, value) {
-                    $(settings.presetsContainer).append('<div class="momongaDraggable" data-momongatype="' +
+                    $(settings.presetsContainer).append('<li><div class="momongaDraggable" data-momongatype="' +
                         key +
                         '">' +
                         value.preview +
-                        '</div>');
+                        '</div></li>');
                 });
                 // Make all source items draggable.
                 // @todo Bind by .on() so this can be outside of the ajax request.
@@ -79,61 +78,74 @@
             '</div>');
 
 
+        var toolbar = $('<div class="momongaToolbar">' +
+            '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
+            '<div class="momongaEdit ui-icon ui-icon-pencil"></div>' +
+            '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
+            '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
+            '</div>');
+
+        $(this).on('click', '.momongaDuplicate',
+            function () {
+                var active = $('.momongaActive');
+                var newItem = active.clone(true);
+                active.after(newItem);
+                var bgColor = newItem.css('background-color');
+                newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
+                    newItem.animate({backgroundColor: bgColor}, 400);
+                });
+            });
+        $(this).on('click', '.momongaDelete',
+            function () {
+                $("#momongaConfirm").dialog({
+                    resizable: false,
+                    modal: true,
+                    position: {of: $('.momongaActive')},
+                    show: {
+                        effect: "fade",
+                        duration: 400
+                    },
+                    hide: {
+                        effect: "fade",
+                        duration: 400
+                    },
+                    buttons: {
+                        "Delete active item": function () {
+                            $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
+                                $('.momongaActive').remove();
+                            });
+                            $(this).dialog("close");
+                        },
+                        "Cancel": function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+
+            }
+        );
+
         // Register click event to all items so they get the context toolbar on click.
         $(this).on('click', settings.item,
             function () {
+                // Disable everything else.
                 $('.momongaActive').removeClass('momongaActive');
                 $('.momongaToolbar').remove();
-
-                var toolbar = $('<div class="momongaToolbar">' +
-                    '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
-                    '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
-                    '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
-                    '</div>');
-
-                toolbar.find('.momongaDuplicate').click(
-                    function () {
-                        var active = $('.momongaActive');
-                        var newItem = active.clone(true);
-                        active.after(newItem);
-                        var bgColor = newItem.css('background-color');
-                        newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
-                            newItem.animate({backgroundColor: bgColor}, 400);
-                        });
-                    }
-                );
-                toolbar.find('.momongaDelete').click(
-                    function () {
-                        $("#momongaConfirm").dialog({
-                            resizable: false,
-                            modal: true,
-                            position: {of: $('.momongaActive')},
-                            show: {
-                                effect: "fade",
-                                duration: 400
-                            },
-                            hide: {
-                                effect: "fade",
-                                duration: 400
-                            },
-                            buttons: {
-                                "Delete active item": function () {
-                                    $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
-                                        $('.momongaActive').remove();
-                                    });
-                                    $(this).dialog("close");
-                                },
-                                "Cancel": function () {
-                                    $(this).dialog("close");
-                                }
-                            }
-                        });
-
-                    }
-                );
+/*
+                var a = settings;
+                console.log(a);
+                console.log(a.hasOwnProperty('edit'));
+                if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
+                    toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
+                }
+                else {
+                    toolbar.find('.momongaEdit').hide();
+                }*/
                 $(this)
                     .addClass('momongaActive')
                     .prepend(toolbar);
+
+
             }
         );
     };
