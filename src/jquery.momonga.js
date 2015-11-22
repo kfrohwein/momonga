@@ -10,6 +10,7 @@
     "use strict";
     $.fn.momonga = function (options) {
 
+        var momonga_containers = $(this);
         var settings = $.extend({
             presetsContainer: '.momongaPresets',
             connectionClass: 'momongaConnected',
@@ -22,18 +23,16 @@
         }, options);
 
         // Add to all targets a class so we can connect them and mark as drop targets.
-        $(this).addClass(settings.connectionClass);
+        momonga_containers.addClass(settings.connectionClass);
 
         // Activate drop sources.
-        $(this).sortable({
+        momonga_containers.sortable({
             containment: 'window',
             connectWith: '.' + settings.connectionClass,
             placeholder: settings.placeholder,
             handle: settings.handler,
             cursor: settings.cursor,
             receive: function (event, ui) {
-                // @todo Do replacement by data attribute to template.
-
                 $(this).children('[data-momongatype]').each(
                     function () {
                         $(this).replaceWith(
@@ -85,7 +84,7 @@
             '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
             '</div>');
 
-        $(this).on('click', '.momongaDuplicate',
+        momonga_containers.on('click', '.momongaDuplicate',
             function () {
                 var active = $('.momongaActive');
                 var newItem = active.clone(true);
@@ -95,7 +94,7 @@
                     newItem.animate({backgroundColor: bgColor}, 400);
                 });
             });
-        $(this).on('click', '.momongaDelete',
+        momonga_containers.on('click', '.momongaDelete',
             function () {
                 $("#momongaConfirm").dialog({
                     resizable: false,
@@ -126,21 +125,21 @@
         );
 
         // Register click event to all items so they get the context toolbar on click.
-        $(this).on('click', settings.item,
+        momonga_containers.on('click', settings.item,
             function () {
                 // Disable everything else.
                 $('.momongaActive').removeClass('momongaActive');
                 $('.momongaToolbar').remove();
-/*
-                var a = settings;
-                console.log(a);
-                console.log(a.hasOwnProperty('edit'));
-                if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
-                    toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
-                }
-                else {
-                    toolbar.find('.momongaEdit').hide();
-                }*/
+                /*
+                 var a = settings;
+                 console.log(a);
+                 console.log(a.hasOwnProperty('edit'));
+                 if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
+                 toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
+                 }
+                 else {
+                 toolbar.find('.momongaEdit').hide();
+                 }*/
                 $(this)
                     .addClass('momongaActive')
                     .prepend(toolbar);
