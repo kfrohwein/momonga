@@ -3,12 +3,12 @@
     "title": "Simple Text",
     "preview": "<p>Simple Text</p>",
     "edit": "ckedit",
-    "html": "<div><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p></div>"
+    "html": "<div><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p></div>"
   },
   "textWithHeading": {
     "title": "A Text with a headline. Just click on the different divs to edit with ckeditor",
     "preview": "<p>A Text with a <strong>headline</strong></p>",
-    "html": "<div class=\"ckeditor\"><h1>Momongas are super cute!</h1></div><div class=\"ckeditor\"><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p></div>"
+    "file": "presets/textWithHeading.html"
   },
   "image": {
     "title": "Just an image",
@@ -20,6 +20,6 @@
     "title": "Bootstrap Media object",
     "preview": "<div style=\"height:50px;width:50px;background-color:#fafad2;\">Media Element</div>",
     "edit": "popup",
-    "html": "<div class=\"media\"><div class=\"media-body\"><h3 class=\"media-heading\">Media heading</h3><p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.</p></div><div class=\"media-right\"><a href=\"#\"><img class=\"media-object\" data-src=\"holder.js/64x64\" alt=\"Generic placeholder image\"></a></div></div></div>"
+    "file": "presets/boostrapMedia.html"
   }
 }
