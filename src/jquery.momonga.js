@@ -24,7 +24,29 @@
                 '<div class="momongaEdit ui-icon ui-icon-pencil"></div>' +
                 '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
                 '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
-                '</div>')
+                '</div>'),
+            replaceItems: function (event, ui) {
+                $(this).children('[data-momongatype]').each(
+                    function () {
+                        var item = $(this);
+                        var momongaType = momongaSettings.presets[item.data('momongatype')];
+                        if (momongaType.html) {
+                            momongaSettings.replaceCallback(momongaType.html, item);
+                        } else if (momongaType.file) {
+
+                            // @todo Decide if there should be some loading spinner thing.
+                            $.get(momongaType.file, function (data) {
+                                momongaSettings.replaceCallback(data, item)
+                            });
+                        }
+                    }
+                );
+            },
+            replaceCallback: function (html, el) {
+                el.replaceWith(
+                    '<div class="momongaItem">' + html + '</div>'
+                );
+            }
         }, options);
 
         // Add to all targets a class so we can connect them and mark as drop targets.
@@ -37,25 +59,7 @@
             placeholder: momongaSettings.placeholder,
             handle: momongaSettings.handler,
             cursor: momongaSettings.cursor,
-            receive: function (event, ui) {
-                $(this).children('[data-momongatype]').each(
-                    function () {
-                        var preset = momongaSettings.presets[$(this).data('momongatype')];
-                        var html = '';
-                        if (preset.html) {
-                            html = preset.html;
-                        } else if (preset.file) {
-                            html = $.get(momongaSettings.file);
-                        } else {
-                            console.log('Momonga could not find any HTML replacement for ' + $(this).data('momongatype'));
-                        }
-                        $(this).replaceWith(
-                            '<div class="momongaItem">' + html + '</div>'
-                        );
-
-                    }
-                );
-            }
+            receive: momongaSettings.replaceItems
         });
 
         // Load the presets and add them to our toolbar.

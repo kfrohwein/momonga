@@ -20,6 +20,6 @@
     "title": "Bootstrap Media object",
     "preview": "<div style=\"height:50px;width:50px;background-color:#fafad2;\">Media Element</div>",
     "edit": "popup",
-    "file": "presets/boostrapMedia.html"
+    "file": "presets/bootstrapMedia.html"
   }
 }
