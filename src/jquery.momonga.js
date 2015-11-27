@@ -21,7 +21,7 @@
             presets: {},
             toolbar: $('<div class="momongaToolbar">' +
                 '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
-                '<div class="momongaEdit ui-icon ui-icon-pencil"></div>' +
+                    //'<div class="momongaEdit ui-icon ui-icon-pencil"></div>' +
                 '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
                 '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
                 '</div>'),
@@ -75,7 +75,7 @@
                         '</div></li>');
                 });
                 // Make all source items draggable.
-                // @todo Bind by .on() so this can be outside of the ajax request.
+                // @todo Move to a separate function.
                 $('.momongaDraggable').draggable({
                     containment: 'window',
                     connectToSortable: '.' + momongaSettings.connectionClass,
