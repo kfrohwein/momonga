@@ -89,7 +89,7 @@
             toolbar: momongaToolbar,
             replaceItems: momongaReplaceItems,
             replaceCallback: momongaReplaceItem,
-            makeDraggale: momongaMakeDraggable
+            makeDraggable: momongaMakeDraggable
         }, options);
 
         /**
@@ -124,7 +124,7 @@
                         '</div></li>');
                 });
                 // Make all source items draggable.
-                momongaSettings._makeDraggable();
+                momongaSettings.makeDraggable();
             }
         );
 
