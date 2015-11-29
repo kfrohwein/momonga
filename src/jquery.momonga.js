@@ -1,58 +1,105 @@
-/*
+/**
  *  Project: Momonga
- *  Description: jQuery Plugin to build HTML content with the use of jQuery UI sortable and drag & drop functionality
- *  Author: Karsten Frohwein
- *  License: MIT
- *
+ *  Description: jQuery Plugin to build HTML content with the use of jQuery UI sortable and drag & drop functionality.
+ *  Copyright (c) 2015 Karsten Frohwein
+ *  Released under the MIT license
+ *  @author: Karsten Frohwein
+ *  @license: MIT
  */
 ;(function ($) {
     "use strict";
     $.fn.momonga = function (options) {
 
+        /**
+         * Replace an item that is dropped to a sortable list.
+         * This is currently only used in the lists receive event.
+         *
+         * @param event
+         * @param ui
+         */
+        function momongaReplaceItems(event, ui) {
+            $(this).children('[data-momongatype]').each(
+                function () {
+                    var item = $(this);
+                    var momongaType = momongaSettings.presets[item.data('momongatype')];
+                    if (momongaType.html) {
+                        momongaSettings.replaceCallback(momongaType.html, item);
+                    } else if (momongaType.file) {
+
+                        // @todo Decide if there should be some loading spinner thing.
+                        $.get(momongaType.file, function (data) {
+                            momongaSettings.replaceCallback(data, item)
+                        });
+                    }
+                }
+            );
+        }
+
+        /**
+         * Wrap the new sortable Item in html.
+         *This is needed because we could get the html directly by json or async from $.get.
+         *
+         * @param html
+         *  HTML provided by the preset by json or an HTML file.
+         * @param el
+         */
+        function momongaReplaceItem(html, el) {
+            el.replaceWith(
+                '<div class="momongaItem">' + html + '</div>'
+            );
+        }
+
+        /**
+         *
+         */
+        function momongaMakeDraggable() {
+            $(momongaSettings.draggableClass).draggable({
+                containment: 'window',
+                connectToSortable: '.' + momongaSettings.connectionClass,
+                helper: 'clone',
+                revert: 'invalid',
+                cursor: 'move'
+            });
+        }
+
+        /**
+         * Our toolbar with some icons provided by jquery UI.
+         * The pencil element should start with display:none; because it only shows if the momongaItem has a class
+         * to be added to this element.
+         * @type {*|HTMLElement}
+         */
+        var momongaToolbar = $('<div class="momongaToolbar">' +
+            '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
+            '<div class="momongaEdit ui-icon ui-icon-pencil" style="display: none;"></div>' +
+            '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
+            '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
+            '</div>');
+
         var momongaSettings = $.extend({
             sortables: $(this),
             presetsContainer: '.momongaPresets',
             connectionClass: 'momongaConnected',
+            draggableClass: '.momongaDraggable',
             placeholder: 'momongaPlaceholder',
             presetsFile: 'momongaPresets.json',
             handler: '.momongaDragHandle',
             item: '.momongaItem',
             cursor: 'move',
             presets: {},
-            toolbar: $('<div class="momongaToolbar">' +
-                '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
-                    //'<div class="momongaEdit ui-icon ui-icon-pencil"></div>' +
-                '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
-                '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
-                '</div>'),
-            replaceItems: function (event, ui) {
-                $(this).children('[data-momongatype]').each(
-                    function () {
-                        var item = $(this);
-                        var momongaType = momongaSettings.presets[item.data('momongatype')];
-                        if (momongaType.html) {
-                            momongaSettings.replaceCallback(momongaType.html, item);
-                        } else if (momongaType.file) {
-
-                            // @todo Decide if there should be some loading spinner thing.
-                            $.get(momongaType.file, function (data) {
-                                momongaSettings.replaceCallback(data, item)
-                            });
-                        }
-                    }
-                );
-            },
-            replaceCallback: function (html, el) {
-                el.replaceWith(
-                    '<div class="momongaItem">' + html + '</div>'
-                );
-            }
+            toolbar: momongaToolbar,
+            replaceItems: momongaReplaceItems,
+            replaceCallback: momongaReplaceItem,
+            makeDraggale: momongaMakeDraggable
         }, options);
 
-        // Add to all targets a class so we can connect them and mark as drop targets.
+        /**
+         * Add to all targets a class so we can connect them and mark as drop targets.
+         */
         momongaSettings.sortables.addClass(momongaSettings.connectionClass);
 
-        // Activate drop sources.
+        /**
+         * Activate drop sources.
+         */
         momongaSettings.sortables.sortable({
             containment: 'window',
             connectWith: '.' + momongaSettings.connectionClass,
@@ -62,8 +109,10 @@
             receive: momongaSettings.replaceItems
         });
 
-        // Load the presets and add them to our toolbar.
-        // @todo Only load file if there weren't any presets at start.
+        /**
+         * Load the presets and add them to our toolbar.
+         * @todo Only load file if there weren't any presets at start.
+         */
         $.getJSON(momongaSettings.presetsFile).done(
             function (data) {
                 momongaSettings.presets = data;
@@ -75,14 +124,7 @@
                         '</div></li>');
                 });
                 // Make all source items draggable.
-                // @todo Move to a separate function.
-                $('.momongaDraggable').draggable({
-                    containment: 'window',
-                    connectToSortable: '.' + momongaSettings.connectionClass,
-                    helper: 'clone',
-                    revert: 'invalid',
-                    cursor: 'move'
-                });
+                momongaSettings._makeDraggable();
             }
         );
 
