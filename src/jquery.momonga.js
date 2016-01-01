@@ -8,8 +8,44 @@
  */
 ;(function ($) {
     "use strict";
+
     $.fn.momonga = function (options) {
 
+        var opts;
+        opts = $.extend({}, $.fn.momonga.defaults, options);
+
+
+        return this.each(function () {
+
+        }
+
+
+        /**
+         * Add delete dialog.
+         *
+         * @todo Change to setting.
+         */
+        momonga.defaults.deleteDialog = function () {
+            $('body').append('<div id="momongaConfirm" style="display: none;" title="Delete active item?">' +
+                '<p><span class="ui-icon ui-icon-alert"></span>' +
+                'The current selected item will be permanently deleted and cannot be recovered. Are you sure you want to proceed?</p>' +
+                '</div>');
+        };
+        /**
+         * Wrap the new sortable Item in html.
+         * This is needed because we could get the html directly by json or async from $.get.
+         *
+         * @param html
+         *  HTML provided by the preset by json or an HTML file.
+         * @param el
+         *
+         * @todo Make HTML an option.
+         */
+        momonga.defaults.replaceItem = function (html, el) {
+            el.replaceWith(
+                '<div class="momongaItem">' + html + '</div>'
+            );
+        };
         /**
          * Replace an item that is dropped to a sortable list.
          * This is currently only used in the lists receive event.
@@ -17,137 +53,121 @@
          * @param event
          * @param ui
          */
-        function momongaReplaceItems(event, ui) {
-            $(this).children('[data-momongatype]').each(
+        momonga.defaults.replaceItems = function (event, ui) {
+            this.children('[data-momongatype]').each(
                 function () {
-                    var item = $(this);
-                    var momongaType = momongaSettings.presets[item.data('momongatype')];
+                    var momongaItem, momongaType;
+                    momongaItem = $(this);
+                    momongaType = momonga.options.presets[momongaItem.data('momongatype')];
                     if (momongaType.html) {
-                        momongaSettings.replaceCallback(momongaType.html, item);
+                        momonga.options.replaceItem(momongaType.html, momongaItem);
                     } else if (momongaType.file) {
-
-                        // @todo Decide if there should be some loading spinner thing.
+                        /**
+                         * @todo Decide if there should be some loading spinner thing.
+                         */
                         $.get(momongaType.file, function (data) {
-                            momongaSettings.replaceCallback(data, item)
+                            momonga.options.replaceItem(data, momongaItem);
                         });
                     }
                 }
             );
-        }
-
-        /**
-         * Wrap the new sortable Item in html.
-         *This is needed because we could get the html directly by json or async from $.get.
-         *
-         * @param html
-         *  HTML provided by the preset by json or an HTML file.
-         * @param el
-         */
-        function momongaReplaceItem(html, el) {
-            el.replaceWith(
-                '<div class="momongaItem">' + html + '</div>'
-            );
-        }
+        };
 
         /**
          *
          */
-        function momongaMakeDraggable() {
-            $(momongaSettings.draggableClass).draggable({
+        momonga.defaults.makeDraggable = function () {
+            $(momonga.options.draggableClass).draggable({
                 containment: 'window',
-                connectToSortable: '.' + momongaSettings.connectionClass,
+                connectToSortable: '.' + momonga.options.connectionClass,
                 helper: 'clone',
                 revert: 'invalid',
                 cursor: 'move'
             });
-        }
+        };
 
-        /**
-         * Our toolbar with some icons provided by jquery UI.
-         * The pencil element should start with display:none; because it only shows if the momongaItem has a class
-         * to be added to this element.
-         * @type {*|HTMLElement}
-         */
-        var momongaToolbar = $('<div class="momongaToolbar">' +
-            '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
-            '<div class="momongaEdit ui-icon ui-icon-pencil" style="display: none;"></div>' +
-            '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
-            '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
-            '</div>');
-
-        var momongaSettings = $.extend({
-            sortables: $(this),
-            presetsContainer: '.momongaPresets',
-            connectionClass: 'momongaConnected',
-            draggableClass: '.momongaDraggable',
-            placeholder: 'momongaPlaceholder',
-            presetsFile: 'momongaPresets.json',
-            handler: '.momongaDragHandle',
-            item: '.momongaItem',
-            cursor: 'move',
-            presets: {},
-            toolbar: momongaToolbar,
-            replaceItems: momongaReplaceItems,
-            replaceCallback: momongaReplaceItem,
-            makeDraggable: momongaMakeDraggable
-        }, options);
+        /*************************************************************
+         * Merge defaults with options and start executing the plugin.
+         *************************************************************/
+        momonga.options = $.extend({}, momonga.defaults, options);
 
         /**
          * Add to all targets a class so we can connect them and mark as drop targets.
          */
-        momongaSettings.sortables.addClass(momongaSettings.connectionClass);
+        momonga.addClass(momonga.options.connectionClass);
 
         /**
          * Activate drop sources.
          */
-        momongaSettings.sortables.sortable({
+        momonga.sortable({
             containment: 'window',
-            connectWith: '.' + momongaSettings.connectionClass,
-            placeholder: momongaSettings.placeholder,
-            handle: momongaSettings.handler,
-            cursor: momongaSettings.cursor,
-            receive: momongaSettings.replaceItems
+            connectWith: '.' + momonga.options.connectionClass,
+            placeholder: momonga.options.placeholder,
+            handle: momonga.options.handler,
+            cursor: momonga.options.cursor,
+            receive: momonga.options.replaceItems
         });
 
         /**
          * Load the presets and add them to our toolbar.
          * @todo Only load file if there weren't any presets at start.
          */
-        $.getJSON(momongaSettings.presetsFile).done(
+        $.getJSON(momonga.options.presetsFile).done(
             function (data) {
-                momongaSettings.presets = data;
-                $.each(momongaSettings.presets, function (key, value) {
-                    $(momongaSettings.presetsContainer).append('<li><div class="momongaDraggable" data-momongatype="' +
+                momonga.options.presets = data;
+                $.each(momonga.options.presets, function (key, value) {
+                    $(momonga.options.presetsContainer).append('<li><div class="momongaDraggable" data-momongatype="' +
                         key +
                         '">' +
                         value.preview +
                         '</div></li>');
                 });
                 // Make all source items draggable.
-                momongaSettings.makeDraggable();
+                momonga.options.makeDraggable();
             }
         );
-
-
-        // Add delete dialog.
-        //@todo This can be done better.
-        $('body').append('<div id="momongaConfirm" style="display: none;" title="Delete active item?">' +
-            '<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>' +
-            'The current selected item will be permanently deleted and cannot be recovered. Are you sure you want to proceed?</p>' +
-            '</div>');
-
-
-        momongaSettings.sortables.on('click', '.momongaDuplicate',
+        /**
+         * Register click event to all items so they get the context toolbar on click.
+         */
+        momonga.on('click', momonga.options.item,
             function () {
-                var active = $('.momongaActive');
-                var newItem = active.clone(true);
+                // Disable everything else.
+                $('.momongaActive').removeClass('momongaActive');
+                $('.momongaToolbar').remove();
+                /*
+                 var a = settings;
+                 console.log(a);
+                 console.log(a.hasOwnProperty('edit'));
+                 if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
+                 toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
+                 }
+                 else {
+                 toolbar.find('.momongaEdit').hide();
+                 }*/
+                $(this)
+                    .addClass('momongaActive')
+                    .prepend(momonga.options.toolbar);
+            });
+        /**
+         * Register Toolbar duplicate action.
+         */
+        momonga.on('click', '.momongaDuplicate',
+            function () {
+                var bgColor, newItem, active;
+
+                active = $('.momongaActive');
+                newItem = active.clone(true);
                 active.after(newItem);
-                var bgColor = newItem.css('background-color');
+                bgColor = newItem.css('background-color');
                 newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
                     newItem.animate({backgroundColor: bgColor}, 400);
                 });
             });
-        momongaSettings.sortables.on('click', '.momongaDelete',
+
+        /**
+         * Register Toolbar delete action.
+         */
+        momonga.on('click', '.momongaDelete',
             function () {
                 $("#momongaConfirm").dialog({
                     resizable: false,
@@ -173,32 +193,41 @@
                         }
                     }
                 });
-
-            }
-        );
-
-        // Register click event to all items so they get the context toolbar on click.
-        momongaSettings.sortables.on('click', momongaSettings.item,
-            function () {
-                // Disable everything else.
-                $('.momongaActive').removeClass('momongaActive');
-                $('.momongaToolbar').remove();
-                /*
-                 var a = momongaSettings;
-                 console.log(a);
-                 console.log(a.hasOwnProperty('edit'));
-                 if (momongaSettings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
-                 toolbar.find('.momongaEdit').addClass(momongaSettings.presets[$(this).data('momongatype')].edit).show();
-                 }
-                 else {
-                 toolbar.find('.momongaEdit').hide();
-                 }*/
-                $(this)
-                    .addClass('momongaActive')
-                    .prepend(momongaSettings.toolbar);
-
-
-            }
-        );
+            });
+        return momonga;
     };
+
+    $.fn.momonga.defaults = {
+        // Selector.
+        presetsContainer: '.momongaPresets',
+        // Classname.
+        connectionClass: 'momongaConnected',
+        // Selector.
+        draggableClass: '.momongaDraggable',
+        // @todo: Classname?
+        placeholder: 'momongaPlaceholder',
+        // URL to JSON file.
+        presetsFile: 'momongaPresets.json',
+        // @todo: Selector?
+        handler: '.momongaDragHandle',
+        // Selector
+        item: '.momongaItem',
+        // CSS Property.
+        cursor: 'move',
+        // You can predefine presets here. They will be merged if a defined a presets file.
+        presets: {}
+    };
+
+    /**
+     * Our toolbar with some icons provided by jquery UI.
+     * .momongaEdit should be display:none; in yor CSS because it only
+     * shows if the momongaItem has a class to be added to this element.
+     * @type {HTMLElement}
+     */
+    $.fn.momonga.toolbar = $('<div class="momongaToolbar">' +
+        '<div class="momongaDragHandle ui-icon ui-icon-arrow-4"></div>' +
+        '<div class="momongaEdit ui-icon ui-icon-pencil"></div>' +
+        '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
+        '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
+        '</div>');
 })(jQuery);
