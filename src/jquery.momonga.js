@@ -11,152 +11,152 @@
 
     $.fn.momonga = function (options) {
 
-        var opts;
+        var opts, cols;
 
         /**
-         * Merge public changable defaults with local options to new opt(ion)s array for this registration.
+         * Merge public changeable defaults with local options to new opt(ion)s array for this registration.
          */
         opts = $.extend({}, $.fn.momonga.defaults, options);
 
+        cols = this;
+        /**
+         * Add to all targets a class so we can connect them and mark as drop targets.
+         */
+        cols.addClass(opts.connectionClass);
+        /**
+         * Load the presets and add them to our toolbar.
+         */
+        $.getJSON(opts.presetsURL)
+            .done(function (data) {
+                /**
+                 * If there was a file merge presets.
+                 */
+                $.extend(true, opts.presets, data);
+            })
+            .always(
+                function () {
+                    $.each(opts.presets, function (key, value) {
+                        // @todo Make overrideable.
+                        $(opts.presetsContainer).append('<li><div class="momongaDraggable" data-momongatype="' +
+                            key +
+                            '">' +
+                            value.preview +
+                            '</div></li>');
+                    });
+                    /**
+                     * Make all source items draggable.
+                     */
+                    opts.makeDraggable(opts.draggableClass, opts.connectionClass);
+                }
+            );
 
         /**
-         * Loop through all columns that should be connected in this d&d set.
+         * Activate drop sources.
          */
-        return this.each(function () {
-
-            var column = $(this);
+        cols.sortable({
+            connectWith: '.' + opts.connectionClass,
+            placeholder: opts.placeholder,
+            handle: opts.handler,
+            cursor: 'move',
             /**
-             * Add to all targets a class so we can connect them and mark as drop targets.
+             * Replace an item that is dropped to a sortable list.
+             * This is currently only used in the lists receive event.
+             *
+             * @param event
+             * @param ui
              */
-            column.addClass(opts.connectionClass);
-
-            /**
-             * Load the presets and add them to our toolbar.
-             * @todo only load if there really is a URL set.
-             */
-            $.getJSON(opts.presetsFile)
-                .done(function (data) {
-                    // Merge presets.
-                    $.extend(true, opts.presets, data);
-                })
-                .always(
+            receive: function (event, ui) {
+                this.children('[data-momongatype]').each(
                     function () {
-                        $.each(opts.presets, function (key, value) {
-                            // @todo Make overrideable.
-                            $(opts.presetsContainer).append('<li><div class="momongaDraggable" data-momongatype="' +
-                                key +
-                                '">' +
-                                value.preview +
-                                '</div></li>');
-                        });
-                        // Make all source items draggable.
-                        opts.makeDraggable(opts.draggableClass, opts.connectionClass);
+                        var self, momongaType;
+                        self = this;
+                        momongaType = opts.presets[self.data('momongatype')];
+                        /**
+                         * @todo Set a spinner class to this item.
+                         */
+                        if (momongaType.html) {
+                            opts.replaceItem(momongaType.html, self);
+                        } else if (momongaType.file) {
+                            $.get(momongaType.file, function (data) {
+                                opts.replaceItem(data, self);
+                            });
+                        }
                     }
                 );
-
-            /**
-             * Activate drop sources.
-             */
-            column.sortable({
-                connectWith: '.' + opts.connectionClass,
-                placeholder: opts.placeholder,
-                handle: opts.handler,
-                cursor: 'move',
-                /**
-                 * Replace an item that is dropped to a sortable list.
-                 * This is currently only used in the lists receive event.
-                 *
-                 * @param event
-                 * @param ui
-                 */
-                receive: function (event, ui) {
-                    this.children('[data-momongatype]').each(
-                        function () {
-                            var self, momongaType;
-                            self = this;
-                            momongaType = opts.presets[self.data('momongatype')];
-                            /**
-                             * @todo Set a spinner class to this item.
-                             */
-                            if (momongaType.html) {
-                                opts.replaceItem(momongaType.html, self);
-                            } else if (momongaType.file) {
-                                $.get(momongaType.file, function (data) {
-                                    opts.replaceItem(data, self);
-                                });
-                            }
-                        }
-                    );
-                }
-            });
-
-            /**
-             * Register click event to all items so they get the context toolbar on click.
-             */
-            column.on('click', opts.item,
-                function () {
-                    // Disable everything else.
-                    $('.momongaActive').removeClass('momongaActive');
-                    $('.momongaToolbar').remove();
-                    /*
-                     var a = settings;
-                     console.log(a);
-                     console.log(a.hasOwnProperty('edit'));
-                     if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
-                     toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
-                     }
-                     else {
-                     toolbar.find('.momongaEdit').hide();
-                     }*/
-                    $(this).addClass('momongaActive').prepend(opts.toolbar);
-                });
-            /**
-             * Register Toolbar duplicate action.
-             */
-            column.on('click', '.momongaDuplicate',
-                function () {
-                    var bgColor, newItem, active;
-
-                    active = $('.momongaActive');
-                    newItem = active.clone(true);
-                    active.after(newItem);
-                    bgColor = newItem.css('background-color');
-                    newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
-                        newItem.animate({backgroundColor: bgColor}, 400);
-                    });
-                });
-
-            /**
-             * Register Toolbar delete action.
-             */
-            column.on('click', '.momongaDelete',
-                function () {
-                    $("#momongaConfirm").dialog({
-                        resizable: false,
-                        modal: true,
-                        position: {of: $('.momongaActive')},
-                        show: {
-                            effect: "fade",
-                            duration: 400
-                        },
-                        hide: {
-                            effect: "fade",
-                            duration: 400
-                        },
-                        buttons: {
-                            "Delete active item": function () {
-                                $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
-                                    $('.momongaActive').remove();
-                                });
-                                $(this).dialog("close");
-                            },
-                            "Cancel": function () {
-                                $(this).dialog("close");
-                            }
-                        }
-                    });
-                });
+            }
         });
+
+        /**
+         * Register click event to all items so they get the context toolbar on click.
+         */
+        cols.on('click', opts.item,
+            function () {
+                // Disable everything else.
+                $('.momongaActive').removeClass('momongaActive');
+                $('.momongaToolbar').remove();
+                /*
+                 var a = settings;
+                 console.log(a);
+                 console.log(a.hasOwnProperty('edit'));
+                 if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
+                 toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
+                 }
+                 else {
+                 toolbar.find('.momongaEdit').hide();
+                 }*/
+                $(this).addClass('momongaActive').prepend(opts.toolbar);
+            }
+        );
+        /**
+         * Register Toolbar duplicate action.
+         */
+        cols.on('click', '.momongaDuplicate',
+            function () {
+                var bgColor, newItem, active;
+
+                active = $('.momongaActive');
+                newItem = active.clone(true);
+                active.after(newItem);
+                bgColor = newItem.css('background-color');
+                newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
+                    newItem.animate({backgroundColor: bgColor}, 400);
+                });
+            }
+        );
+
+        /**
+         * Register Toolbar delete action.
+         */
+        cols.on('click', '.momongaDelete',
+            function () {
+                $("#momongaConfirm").dialog({
+                    resizable: false,
+                    modal: true,
+                    position: {of: $('.momongaActive')},
+                    show: {
+                        effect: "fade",
+                        duration: 400
+                    },
+                    hide: {
+                        effect: "fade",
+                        duration: 400
+                    },
+                    buttons: {
+                        "Delete active item": function () {
+                            $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
+                                $('.momongaActive').remove();
+                            });
+                            $(this).dialog("close");
+                        },
+                        "Cancel": function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            }
+        );
+
+        return cols;
     };
     /**
      * Add delete dialog.
@@ -207,7 +207,7 @@
         // @todo: Classname?
         placeholder: 'momongaPlaceholder',
         // URL to JSON file.
-        presetsFile: 'momongaPresets.json',
+        presetsURL: '',
         // @todo: Selector?
         handler: '.momongaDragHandle',
         // Selector
