@@ -11,18 +11,18 @@
 
     $.fn.momonga = function (options) {
 
-        var opts, cols;
+        var opts, self;
 
         /**
          * Merge public changeable defaults with local options to new opt(ion)s array for this registration.
          */
         opts = $.extend({}, $.fn.momonga.defaults, options);
 
-        cols = this;
+        self = this;
         /**
          * Add to all targets a class so we can connect them and mark as drop targets.
          */
-        cols.addClass(opts.connectionClass);
+        self.addClass(opts.connectionClass);
         /**
          * Load the presets and add them to our toolbar.
          */
@@ -51,9 +51,9 @@
             );
 
         /**
-         * Activate drop sources.
+         * Use jQuery UIs sortable to activate the columns.
          */
-        cols.sortable({
+        self.sortable({
             connectWith: '.' + opts.connectionClass,
             placeholder: opts.placeholder,
             handle: opts.handler,
@@ -68,17 +68,17 @@
             receive: function (event, ui) {
                 this.children('[data-momongatype]').each(
                     function () {
-                        var self, momongaType;
-                        self = this;
-                        momongaType = opts.presets[self.data('momongatype')];
+                        var _self, momongaType;
+                        _self = this;
+                        momongaType = opts.presets[_self.data('momongatype')];
                         /**
                          * @todo Set a spinner class to this item.
                          */
                         if (momongaType.html) {
-                            opts.replaceItem(momongaType.html, self);
+                            opts.replaceItem(momongaType.html, _self);
                         } else if (momongaType.file) {
                             $.get(momongaType.file, function (data) {
-                                opts.replaceItem(data, self);
+                                opts.replaceItem(data, _self);
                             });
                         }
                     }
@@ -89,7 +89,7 @@
         /**
          * Register click event to all items so they get the context toolbar on click.
          */
-        cols.on('click', opts.item,
+        self.on('click', opts.item,
             function () {
                 // Disable everything else.
                 $('.momongaActive').removeClass('momongaActive');
@@ -110,7 +110,7 @@
         /**
          * Register Toolbar duplicate action.
          */
-        cols.on('click', '.momongaDuplicate',
+        self.on('click', '.momongaDuplicate',
             function () {
                 var bgColor, newItem, active;
 
@@ -127,7 +127,7 @@
         /**
          * Register Toolbar delete action.
          */
-        cols.on('click', '.momongaDelete',
+        self.on('click', '.momongaDelete',
             function () {
                 $("#momongaConfirm").dialog({
                     resizable: false,
@@ -156,7 +156,7 @@
             }
         );
 
-        return cols;
+        return self;
     };
     /**
      * Add delete dialog.
@@ -185,7 +185,7 @@
         );
     };
 
-    /**
+    /** Activate jQuery UIs draggable for all our sources.
      *
      */
     $.fn.momonga.makeDraggable = function (draggableClass, connectionClass) {
