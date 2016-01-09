@@ -1,0 +1,168 @@
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Momonga example in cooperation with Bootstrap 101 Template</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+          integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
+          integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/start/jquery-ui.css">
+    <link rel="stylesheet" href="css/momonga.css">
+
+</head>
+<body>
+<div class="container">
+    <div class="header clearfix">
+        <nav>
+            <ul class="nav nav-pills pull-right">
+                <li role="presentation" class="active"><a href="/">Home</a></li>
+                <li role="presentation"><a href="/momongaDemo/index.html">Momonga</a></li>
+                <li role="presentation"><a href="https://github.com/kfrohwein">Fork me on github</a></li>
+            </ul>
+        </nav>
+        <h3 class="text-muted">Karsten Frohwein - Gihub Projects</h3>
+    </div>
+
+    <div class="jumbotron momongaSortable">
+        <div class="momongaItem">
+            <div>
+                <h1>Jumbotron heading</h1>
+
+                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac
+                    cursus
+                    commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+
+                <p>Lore Ipsum Dolor</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 momongaSortable">
+            <div class="momongaItem">
+                <div class="momongaVideo">
+                    <iframe src="https://www.youtube.com/embed/25x1XWRKzXc" frameborder="0"
+                            allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="momongaItem">
+                <div>
+                    <h3>Subheading</h3>
+
+                    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+                </div>
+            </div>
+            <div class="momongaItem">
+                <div>
+                    <h3>Subheading</h3>
+
+                    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit
+                        amet
+                        fermentum.</p>
+                </div>
+            </div>
+            <div class="momongaItem">
+                <div>
+                    <h3>Subheading</h3>
+
+                    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 momongaSortable">
+            <div class="momongaItem">
+                <div>
+                    <h3>Subheading</h3>
+
+                    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                </div>
+            </div>
+            <div class="momongaItem">
+                <div>
+                    <h3>Subheading</h3>
+
+                    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-xs-6 col-lg-4 momongaSortable">
+            <div class="momongaItem">
+                <div class="media">
+                    <div class="media-body">
+                        <h3 class="media-heading">Media heading</h3>
+
+                        <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante
+                            sollicitudin
+                            commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.</p>
+                    </div>
+                    <div class="media-right">
+                        <a href="#">
+                            <img class="media-object" src="images/momonga1.jpg" style="width: 64px;height: 64px;"
+                                 alt="Generic placeholder image">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 col-lg-4 momongaSortable">
+            <div class="momongaItem">
+                <h2>Heading</h2>
+
+                <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor
+                    mauris
+                    condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna
+                    mollis
+                    euismod. Donec sed odio dui. </p>
+
+                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar">
+    <h4>Drag these presets into your content</h4>
+
+    <ul class="momongaPresets"></ul>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2015 Karsten Frohwein</p>
+
+    <p>Video and images from the video by <a href="https://www.youtube.com/channel/UC1oYieVSXHKMMfXbXb_iNOw">ExtraordinaryEPIC</a>
+    </p>
+</footer>
+
+<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://cdn.ckeditor.com/4.5.4/standard/ckeditor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.5.4/adapters/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
+        integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.0/holder.min.js"></script>
+<script src="src/jquery.momonga.js"></script>
+<script language="JavaScript">
+    (function ($) {
+        var sortables = $('.momongaSortable');
+        console.log(sortables.momonga());
+
+        sortables.on('click', '.ckeditor', function () {
+            $(this).attr('contenteditable', 'true');
+            $(this).ckeditor();
+        });
+
+    }(jQuery));
+</script>
+
+</body>
+</html>
