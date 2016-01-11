@@ -12,7 +12,6 @@
     $.fn.momonga = function (options) {
 
         var opts, self;
-
         /**
          * Merge public changeable defaults with local options to new opt(ion)s array for this registration.
          */
@@ -66,10 +65,10 @@
              * @param ui
              */
             receive: function (event, ui) {
-                this.children('[data-momongatype]').each(
+                $(this).children('[data-momongatype]').each(
                     function () {
                         var _self, momongaType;
-                        _self = this;
+                        _self = $(this);
                         momongaType = opts.presets[_self.data('momongatype')];
                         /**
                          * @todo Set a spinner class to this item.
