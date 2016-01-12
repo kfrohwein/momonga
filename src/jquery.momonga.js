@@ -9,50 +9,68 @@
 ;(function ($) {
     "use strict";
 
+    /**
+     * Register all events and make the desired containers sortable.
+     * @param options
+     * @returns {jQuery}
+     */
     $.fn.momonga = function (options) {
 
-        var opts, self;
+        var opts, presetsContainer;
         /**
          * Merge public changeable defaults with local options to new opt(ion)s array for this registration.
          */
         opts = $.extend({}, $.fn.momonga.defaults, options);
 
-        self = this;
+        /**
+         * Register events to current presets container.
+         */
+        presetsContainer = $(opts.presetsContainer);
+        presetsContainer
+            .on('momonga:AddPresets',
+                function (e, presets) {
+                    opts.addPresets.apply(presetsContainer, [presets]);
+                }
+            )
+            .on('momonga:makePresetsDraggable',
+                function (e, connectionClass) {
+                    var items;
+                    items = $(opts.draggableClass);
+                    opts.makePresetsDraggable.apply(items, [connectionClass]);
+                }
+            );
+
+
         /**
          * Add to all targets a class so we can connect them and mark as drop targets.
          */
-        self.addClass(opts.connectionClass);
+        this.addClass(opts.connectionClass);
+
         /**
          * Load the presets and add them to our toolbar.
          */
-        $.getJSON(opts.presetsURL)
-            .done(function (data) {
-                /**
-                 * If there was a file merge presets.
-                 */
-                $.extend(true, opts.presets, data);
-            })
-            .always(
-                function () {
-                    $.each(opts.presets, function (key, value) {
-                        // @todo Make overrideable.
-                        $(opts.presetsContainer).append('<li><div class="momongaDraggable" data-momongatype="' +
-                            key +
-                            '">' +
-                            value.preview +
-                            '</div></li>');
-                    });
+        if (opts.presetsURL) {
+            $.getJSON(opts.presetsURL)
+                .done(function (data) {
                     /**
-                     * Make all source items draggable.
+                     * If there was a file merge presets recursively and make them draggagle.
+                     * @todo Add spinner.
                      */
-                    opts.makeDraggable(opts.draggableClass, opts.connectionClass);
-                }
-            );
+                    $.extend(true, opts.presets, data);
+                    presetsContainer
+                        .trigger('momonga:AddPresets', [opts.presets])
+                        .trigger('momonga:makePresetsDraggable', [opts.connectionClass]);
+                });
+        } else if (opts.presets) {
+            presetsContainer
+                .trigger('momonga:AddPresets', [opts.presets])
+                .trigger('momonga:makePresetsDraggable', [opts.connectionClass]);
+        }
 
         /**
          * Use jQuery UIs sortable to activate the columns.
          */
-        self.sortable({
+        this.sortable({
             connectWith: '.' + opts.connectionClass,
             placeholder: opts.placeholder,
             handle: opts.handler,
@@ -88,74 +106,75 @@
         /**
          * Register click event to all items so they get the context toolbar on click.
          */
-        self.on('click', opts.item,
-            function () {
-                // Disable everything else.
-                $('.momongaActive').removeClass('momongaActive');
-                $('.momongaToolbar').remove();
-                /*
-                 var a = settings;
-                 console.log(a);
-                 console.log(a.hasOwnProperty('edit'));
-                 if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
-                 toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
-                 }
-                 else {
-                 toolbar.find('.momongaEdit').hide();
-                 }*/
-                $(this).addClass('momongaActive').prepend(opts.toolbar);
-            }
-        );
-        /**
-         * Register Toolbar duplicate action.
-         */
-        self.on('click', '.momongaDuplicate',
-            function () {
-                var bgColor, newItem, active;
+        this
+            .on('click', opts.item,
+                function (e) {
+                    e.preventDefault();
+                    // Disable everything else.
+                    $('.momongaActive').removeClass('momongaActive');
+                    $('.momongaToolbar').remove();
+                    /*
+                     var a = settings;
+                     console.log(a);
+                     console.log(a.hasOwnProperty('edit'));
+                     if (settings.presets[$(this).data('momongatype')].hasOwnProperty('edit')) {
+                     toolbar.find('.momongaEdit').addClass(settings.presets[$(this).data('momongatype')].edit).show();
+                     }
+                     else {
+                     toolbar.find('.momongaEdit').hide();
+                     }*/
+                    $(this).addClass('momongaActive').prepend(opts.toolbar);
+                }
+            )
+            /**
+             * Register Toolbar duplicate action.
+             */
+            .on('click', '.momongaDuplicate',
+                function () {
+                    var bgColor, newItem, active;
 
-                active = $('.momongaActive');
-                newItem = active.clone(true);
-                active.after(newItem);
-                bgColor = newItem.css('background-color');
-                newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
-                    newItem.animate({backgroundColor: bgColor}, 400);
-                });
-            }
-        );
-
-        /**
-         * Register Toolbar delete action.
-         */
-        self.on('click', '.momongaDelete',
-            function () {
-                $("#momongaConfirm").dialog({
-                    resizable: false,
-                    modal: true,
-                    position: {of: $('.momongaActive')},
-                    show: {
-                        effect: "fade",
-                        duration: 400
-                    },
-                    hide: {
-                        effect: "fade",
-                        duration: 400
-                    },
-                    buttons: {
-                        "Delete active item": function () {
-                            $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
-                                $('.momongaActive').remove();
-                            });
-                            $(this).dialog("close");
+                    active = $('.momongaActive');
+                    newItem = active.clone(true);
+                    active.after(newItem);
+                    bgColor = newItem.css('background-color');
+                    newItem.animate({backgroundColor: "#fafad2"}, 400, function () {
+                        newItem.animate({backgroundColor: bgColor}, 400);
+                    });
+                }
+            )
+            /**
+             * Register Toolbar delete action.
+             */
+            .on('click', '.momongaDelete',
+                function () {
+                    $("#momongaConfirm").dialog({
+                        resizable: false,
+                        modal: true,
+                        position: {of: $('.momongaActive')},
+                        show: {
+                            effect: "fade",
+                            duration: 400
                         },
-                        "Cancel": function () {
-                            $(this).dialog("close");
+                        hide: {
+                            effect: "fade",
+                            duration: 400
+                        },
+                        buttons: {
+                            "Delete active item": function () {
+                                $('.momongaActive').animate({backgroundColor: "#fa8072"}, 400).fadeOut(400, function () {
+                                    $('.momongaActive').remove();
+                                });
+                                $(this).dialog("close");
+                            },
+                            "Cancel": function () {
+                                $(this).dialog("close");
+                            }
                         }
-                    }
-                });
-            }
-        );
+                    });
+                }
+            );
 
-        return self;
+        return this;
     };
     /**
      * Add delete dialog.
@@ -184,11 +203,11 @@
         );
     };
 
-    /** Activate jQuery UIs draggable for all our sources.
-     *
+    /**
+     * Activate jQuery UIs draggable for all our sources.
      */
-    $.fn.momonga.makeDraggable = function (draggableClass, connectionClass) {
-        $(draggableClass).draggable({
+    $.fn.momonga.makePresetsDraggable = function (connectionClass) {
+        this.draggable({
             containment: 'window',
             connectToSortable: '.' + connectionClass,
             helper: 'clone',
@@ -196,14 +215,26 @@
             cursor: 'move'
         });
     };
+
+    $.fn.momonga.addPresets = function (presets) {
+        var container;
+        container = this;
+        $.each(presets, function (key, value) {
+            container.append('<li><div class="momongaDraggable" data-momongatype="' +
+                key +
+                '">' +
+                value.preview +
+                '</div></li>');
+        });
+    };
     $.fn.momonga.defaults = {
         // Selector.
         presetsContainer: '.momongaPresets',
-        // Classname.
-        connectionClass: 'momongaConnected',
         // Selector.
         draggableClass: '.momongaDraggable',
-        // @todo: Classname?
+        // Classname.
+        connectionClass: 'momongaConnected',
+        // Classname.
         placeholder: 'momongaPlaceholder',
         // URL to JSON file.
         presetsURL: '',
@@ -225,8 +256,9 @@
             '<div class="momongaDuplicate ui-icon ui-icon-copy"></div>' +
             '<div class="momongaDelete ui-icon ui-icon-trash"></div>' +
             '</div>'),
-        makeDraggable: $.fn.momonga.makeDraggable,
-        replaceItems: $.fn.momonga.replaceItems,
+        makePresetsDraggable: $.fn.momonga.makePresetsDraggable,
+        addPresets: $.fn.momonga.addPresets,
+        //replaceItems: $.fn.momonga.replaceItems,
         replaceItem: $.fn.momonga.replaceItem,
     };
 
