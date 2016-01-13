@@ -110,6 +110,7 @@
             .on('click', opts.item,
                 function (e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     // Disable everything else.
                     $('.momongaActive').removeClass('momongaActive');
                     $('.momongaToolbar').remove();
@@ -232,9 +233,9 @@
         presetsContainer: '.momongaPresets',
         // Selector.
         draggableClass: '.momongaDraggable',
-        // Classname.
+        // Class name.
         connectionClass: 'momongaConnected',
-        // Classname.
+        // Class name.
         placeholder: 'momongaPlaceholder',
         // URL to JSON file.
         presetsURL: '',

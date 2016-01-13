@@ -167,6 +167,12 @@
 <script language="JavaScript">
     (function ($) {
         var sortables = $('.momongaSortable');
+        /**
+         * Enable the plugin on all containers probably divs server as d&d targets and are sortable.
+         *
+         * Below we use a directly added preset and load a file for more. Both are merged and added to the sidebar.
+         * The presets are simple json.
+         */
         sortables.momonga({
                     presets: {
                         "text": {
@@ -185,6 +191,12 @@
         sidebar = $('.sidebar');
         sidebar.sidebar();
 
+        $('.momongaPresets').on('momonga:makePresetsDraggable',
+                function () {
+                    $('.sidebar').trigger("sidebar:toggle");
+                    container.toggleClass('sidebarOn');
+                }
+        );
         $('.toggle').click(function () {
             $('.sidebar').trigger("sidebar:toggle");
             container.toggleClass('sidebarOn');
